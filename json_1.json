@@ -1,0 +1,16 @@
+[
+   {
+      "id":1,
+      "name":"coupon_name_1",
+      "description":"coupon_description_1",
+      "start_date":"1/1/14",
+      "end_date":"2/2/14"
+   },
+   {
+      "id":2,
+      "name":"coupon_name_2",
+      "description":"coupon_description_2",
+      "start_date":"3/3/14",
+      "end_date":"4/4/14"
+   }
+]

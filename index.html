@@ -1,0 +1,109 @@
+<html>
+  <head>
+    <title>Demo</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+
+    <script type="text/javascript">       
+        /**
+         * JS stlye Coupon class
+         * intializer attributes           
+         * @attribute => html container
+         * @attribute => data (optional)                      
+         */
+        function Coupon(container,data){
+          this.data = { "coupons" : data };
+          this.container = container;          
+        }
+
+        /**
+         * Object method
+         * gets JSON 
+         * @param => url
+         * @param => callback function to exec after json loaded (i.e) renderView
+         */
+        Coupon.prototype.getJSON = function(url, callback){
+          var proxy = this;     // Preserve scope
+
+          $.getJSON(url, function(data){
+            proxy.data.coupons = data;
+            callback();
+          });
+        }
+
+        /**
+         * render the json data as html
+         * @param => template_id 
+         */
+        Coupon.prototype.renderView = function(template_id){
+          var template = $("#"+template_id).html();
+          if(!template){
+            console.log("Template " + template_id + "does not exist");
+            return false;
+          }
+          var render_html = Mustache.render(template, this.data);
+          $("#"+this.container).html(render_html);
+        }
+
+        $(function(){
+            /**
+             * Starts here on document ready
+             */
+            var coupon = new Coupon("container");
+
+            coupon.getJSON("json_3.json", function() {
+              coupon.renderView("template_3");
+            });
+        });
+
+        /** ---- Demo Purpose -----------**/
+        function simulate(id){
+          coupon = new Coupon("container");
+          coupon.getJSON("json_"+id+".json", function() {
+            coupon.renderView("template_"+id);
+          });
+        }
+        /** ---- Demo Purpose -----------**/        
+    </script>
+  </head>
+  <body>
+    <h3 align="center"> Welcome </h3>
+
+    <fieldset>      
+      <div id="container"></div>
+    </fieldset>    
+
+    <!-- Demo purpose -->
+    <br/>
+    <div align="center">
+      <button type="button" onclick="simulate(1)">get JSON1</button>
+      <button type="button" onclick="simulate(2)">get JSON2</button>
+      <button type="button" onclick="simulate(3)">get JSON3</button>
+    </div>
+    <!-- Demo purpose -->
+
+    <script id="template_1" type="x-tmpl-mustache">
+      Greetings !!
+      {{#coupons}}      
+
+      <p>Checkout {{name}} which offers {{description}}</p>
+
+      {{/coupons}}
+    </script>
+
+    <script id="template_2" type="x-tmpl-mustache">
+      Hi {{coupons.user}},
+         You have the following coupons activated!
+         <ul>
+         {{#coupons.activated_coupons}}
+            <li>{{.}}</li>
+         {{/coupons.activated_coupons}}
+         </ul>
+    </script>
+
+    <script id="template_3" type="x-tmpl-mustache">
+        <h3>Attention</h3>
+        <h2>{{coupons.name}}</h2>
+    </script>
+  </body>
+</html>
