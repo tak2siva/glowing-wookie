@@ -1,1 +1,11 @@
-{"id":1,"name":"Tweet and get 25% offer"}
+{
+   "username":"Lee James",
+   "template_id":"3",
+   "coupon":{
+      "name":"60% off any service",
+      "desc":"Limited time special",
+      "image":"http://www.w3schools.com/images/pulpit.jpg",
+      "promo_code":"DEWSC45DR",
+      "End_date":"2014-09-10T00:00:00-04:00"
+   }
+}

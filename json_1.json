@@ -1,16 +1,12 @@
-[
-   {
-      "id":1,
-      "name":"coupon_name_1",
-      "description":"coupon_description_1",
-      "start_date":"1/1/14",
-      "end_date":"2/2/14"
-   },
-   {
-      "id":2,
-      "name":"coupon_name_2",
-      "description":"coupon_description_2",
-      "start_date":"3/3/14",
-      "end_date":"4/4/14"
+{  
+   "username":"John Lee",
+   "template_id":"1",
+   "coupon" :{
+       "name": "25% off",
+       "code": "25OFF",
+       "description": "25% off for item1",
+       "percentage": "25",
+       "start_date": "7/12/2014", 
+       "end_date": "7/20/2014"
    }
-]
+} 

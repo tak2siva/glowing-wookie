@@ -1,0 +1,17 @@
+<html>
+<head>
+	<title>Socket Event Trigger</title>
+	<script type="text/javascript">
+	 var webSocket = new WebSocket("ws://localhost:8090");
+
+     webSocket.onmessage = function(e) {
+      console.log("Server : " + e.data);
+     }
+	</script>
+</head>
+<body>
+<label for="message">Type the template id here</label>
+	<input type="text" id="message"/>
+	<button type="button" onclick="webSocket.send( document.getElementById('message').value)"> Send </button>
+</body>
+</html>

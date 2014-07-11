@@ -1,10 +1,11 @@
 {
-   "id":1,
-   "user":"Ryan gosling",
-   "activated_coupons":[
-      "coupon_1",
-      "coupon_2",
-      "coupon_3"
-   ],
-   "end_date":"5/5/14"
+   "username":"Tom Revis",
+   "template_id":"2",
+   "coupon":{
+      "name":"FIT_MATTERS_Sale_20percent_off_W3040168wis",
+      "code":"FRJUY65BN",
+      "description":"25% off for item1",
+      "displayStart":"2013-05-31T00:00:00-04:00",
+      "displayEnd":"2013-06-10T00:00:00-04:00"
+   }
 }
