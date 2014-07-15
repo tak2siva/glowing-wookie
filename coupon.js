@@ -26,6 +26,14 @@ Coupon.prototype.getJSON = function(url, callback){
   });
 }
 
+/*
+ * Set JSON obj directly instead of URL
+ * @param => JSON object
+ */
+Coupon.prototype.setJSON = function(data){
+  this.data = data;
+}
+
 /**
  * render the json data as html
  * @param => template_id 
@@ -63,8 +71,20 @@ $(function(){
 
      webSocket.onmessage = function(e) {
       console.log("Server : " + e.data);
-      simulate(e.data);
+
+      var jsonObj;
+
+      try{
+        jsonObj = JSON.parse(e.data);   // parse string to JSON Obj
+      } catch(error){
+        console.log(error.message);
+      }
+
+      if(jsonObj){
+        var coupon = new Coupon("container", jsonObj);
+        coupon.renderView();
+      }
+
      }
     
-});
- 
+}); 
