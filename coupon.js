@@ -67,12 +67,4 @@ $(function(){
      }
     
 });
-
-/** ---- Demo Purpose -----------**/
-function simulate(id){
-  coupon = new Coupon("container");
-  coupon.getJSON("json_"+id+".json", function() {
-    coupon.renderView();
-  });
-}
-/** ---- Demo Purpose -----------**/       
+ 
