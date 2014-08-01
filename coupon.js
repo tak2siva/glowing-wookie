@@ -66,8 +66,24 @@ $(function(){
      */
      Coupon.renderHomePage();
 
+     var terminal_id;
+
+     var sys_call_back = function(obj){
+      terminal_id = obj.val.serialNumber.val;
+     }
+
+     _svc.sysInfo.platform(sys_call_back); // Get terminal id
+
 
      var webSocket = new WebSocket("ws://localhost:8090");
+
+     webSocket.onopen = function(){
+      var send_data = {
+        terminal_id: terminal_id,
+        terminal_status: "Open"
+      };
+      webSocket.send(JSON.stringify(send_data));      
+     }
 
      webSocket.onmessage = function(e) {
       console.log("Server : " + e.data);
