@@ -68,8 +68,9 @@ $(function(){
 
      var terminal_id;
 
-     var sys_call_back = function(obj){
+     var sys_call_back = function(obj){	  
       terminal_id = obj.val.serialNumber.val;
+	  console.log("terminal id: " + terminal_id);
      }
 
      _svc.sysInfo.platform(sys_call_back); // Get terminal id
