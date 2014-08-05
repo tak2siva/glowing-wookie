@@ -67,17 +67,18 @@ $(function(){
      Coupon.renderHomePage();
 
      var terminal_id;
+     var webSocket;
 
      var sys_call_back = function(obj){	  
       terminal_id = obj.val.serialNumber.val;
-	  console.log("obj stringify: " + JSON.stringify(obj));
-	  console.log("terminal id: " + terminal_id);
+
+	    console.log("obj stringify: " + JSON.stringify(obj));
+	    console.log("terminal id: " + terminal_id);
+
+      webSocket = new WebSocket("ws://localhost:8090"); // Init socket after getting terminal id
      }
 
-     _svc.sysInfo.platform(sys_call_back); // Get terminal id
-
-
-     var webSocket = new WebSocket("ws://localhost:8090");
+     _svc.sysInfo.platform(sys_call_back); // Get terminal id      
 
      webSocket.onopen = function(){
       var send_data = {
