@@ -70,6 +70,7 @@ $(function(){
 
      var sys_call_back = function(obj){	  
       terminal_id = obj.val.serialNumber.val;
+	  console.log("obj stringify: " + JSON.stringify(obj));
 	  console.log("terminal id: " + terminal_id);
      }
 
