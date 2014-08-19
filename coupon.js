@@ -7,6 +7,13 @@ var TerminalApp = {
     url: "ws://vfilvgcepdev.verifone.com:9080/verifonecloud/v1/broadcastserver"
 };
 
+/*
+ * Util function to generate random num between range
+ */
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function Coupon(container, data) {
     this.data = data;
     this.container = container;
@@ -75,7 +82,7 @@ TerminalApp.get_terminal_id = function(){
 }
 
 TerminalApp.send_id = function(){
-    if(TerminalApp.webSocket){
+    if(TerminalApp.webSocket.readyState == 1){
         var send_data = {
             terminal_id: TerminalApp.terminal_id,
             terminal_status: "Open"
@@ -83,7 +90,7 @@ TerminalApp.send_id = function(){
         console.log("Sending data to server: " + JSON.stringify(send_data));
         TerminalApp.webSocket.send(JSON.stringify(send_data));
     } else {
-        console.log("webSocket not initialized");
+        console.log("TerminalApp.send_id: webSocket not initialized");
         return false;
     }
 }
@@ -135,11 +142,15 @@ TerminalApp.callPHP = function callPHP(url, xmlOut, cb) {
  */
 TerminalApp.terminal_id_cron = setInterval(function(){
     if(TerminalApp.terminal_id){
-        clearInterval(TerminalApp.terminal_id_cron);
-        console.log("Got terminal_id: " + TerminalApp.terminal_id);
-        TerminalApp.send_id();  // Send terminal_id to server via socket
+        if(TerminalApp.webSocket.readyState == 1){
+            clearInterval(TerminalApp.terminal_id_cron);
+            console.log("TerminalApp.terminal_id_cron: Got terminal_id: " + TerminalApp.terminal_id);
+            TerminalApp.send_id();  // Send terminal_id to server via socket
+        } else {
+            console.log("TerminalApp.terminal_id_cron: WebSocket not initialized")
+        }
     } else {
-        console.log("Retrying for terminal_id");
+        console.log("TerminalApp.terminal_id_cron: Retrying for terminal_id");
     }
 },TerminalApp.terminal_id_cron_interval);
 
@@ -187,6 +198,16 @@ TerminalApp.init_web_socket_events = function(){
                 TerminalApp.reset_payment_cron(); // Reset 20 sec timeout after every msg
             }
         }
+
+        TerminalApp.webSocket.onclose = function(e){
+            console.log("webSocket.onclose: webSocket closed or error. Re-initializing...");
+
+            // Re-initialize webSocket after 10-20 sec
+            setTimeout(function(){
+                TerminalApp.init_web_socket();
+            },getRandomInt(5,10) * 1000);
+
+        }
     }
 }
 
@@ -197,7 +218,7 @@ function init_testing_setup(){
     window._svc = {};
     _svc.sysInfo = { platform : function(a){
         console.log("Called _svc system callback in test");
-        for(i=0;i<5000;i++){console.log("loop");}
+        for(i=0;i<2000;i++){console.log("loop");}
             TerminalApp.terminal_id =123123;
     }}
   //  _svc.sysInfo.platform(); // Get terminal id
@@ -216,15 +237,89 @@ TerminalApp.init = function(){
     TerminalApp.init_payment_cron();    
 }
 
+/*
+ * Create carousel effect
+ */
+function render_carousel(js_data, template){
+    var carousel_template = template || "carousel_template";
+    var template = $("#"+carousel_template).html();
+    var render = Mustache.render(template,js_data.terminal_message);
+
+    $("#container").html(render);
+
+    $(".couponbutton").on("click",function(){
+        var coupon_id = $(this).attr('coupon_id');
+
+        // To toggle barcode when use coupon button is clicked
+        $("#org_coupon_"+coupon_id).hide();
+        $("#barcode_coupon_"+coupon_id).show();
+    });
+
+    this.options = {
+                    $AutoPlay: false,
+
+                    $PauseOnHover: true,                               //[Optional] Whether to pause when mouse over if a slideshow is auto playing, default value is false
+
+                    $ArrowKeyNavigation: true,                          //Allows arrow key to navigate or not
+                    $SlideWidth: 600,                                   //[Optional] Width of every slide in pixels, the default is width of 'slides' container
+                    $SlideHeight: 298,                                  //[Optional] Height of every slide in pixels, the default is width of 'slides' container
+                    $SlideSpacing: 10,                                  //Space between each slide in pixels
+                    $DisplayPieces: 2,                                  //Number of pieces to display (the slideshow would be disabled if the value is set to greater than 1), the default value is 1
+                    $ParkingPosition: 100,                                //The offset position to park slide (this options applys only when slideshow disabled).
+
+                    $ArrowNavigatorOptions: {                       //[Optional] Options to specify and enable arrow navigator or not
+                        $Class: $JssorArrowNavigator$,              //[Requried] Class to create arrow navigator instance
+                        $ChanceToShow: 2,                               //[Required] 0 Never, 1 Mouse Over, 2 Always
+                        $AutoCenter: 2,                                 //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
+                        $Steps: 1                                       //[Optional] Steps to go for each navigation request, default value is 1
+                    }
+                };
+
+    var jssor_slider1 = new $JssorSlider$("slider1_container", options);
+
+}
+
+function add_banner(){
+    var globalx = 800;
+    var vector = -1;
+    var interval = 120;
+    var canvas = document.getElementById('bannershow');
+    var ctx = canvas.getContext('2d');
+    var fontsize = 25;
+    var canvasHeight = 40;
+    var canvasWidth = 800;
+
+    function banner(label) {
+
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);    
+        ctx.fillStyle = 'rgb(0, 0, 0)';
+        ctx.fillRect (0, 0, canvasWidth, canvasHeight);
+
+        ctx.fillStyle = 'white'
+        ctx.font = fontsize + 'px Helvetica';
+        ctx.textBaseline = 'top';
+        if (globalx < 0 - ctx.measureText(label).width) {
+             globalx = canvasWidth;
+        }                        
+        ctx.fillText(label, globalx, (canvasHeight-fontsize)/2);
+
+        globalx += vector;
+    }
+    setInterval(banner, 1000/interval, 'test test test');   
+}
+
 $(function() {
     Coupon.renderHomePage();
 
-    //init_testing_setup();
+    init_testing_setup();
     $("#no_thanks").click(function(){
         TerminalApp.switchToPayment();
     })
 
     TerminalApp.init();
+
+    render_carousel(test_data);
+    add_banner();
 });
 
 
