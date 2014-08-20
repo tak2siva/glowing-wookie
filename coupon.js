@@ -204,7 +204,7 @@ TerminalApp.init_web_socket_events = function(){
                 var coupon = new Coupon("container", jsonObj);
                 console.log("Rendering coupon page");
                 //coupon.renderView();  Ignored template_* 
-                coupon.renderViewCarousel(coupon.data); // Render Carousel
+                coupon.renderViewCarousel(coupon.data);
 
                 TerminalApp.reset_payment_cron(); // Reset 20 sec timeout after every msg
             }
@@ -322,16 +322,12 @@ function add_banner(){
 $(function() {
     Coupon.renderHomePage();
 
-   // init_testing_setup();
-
     $("#no_thanks").click(function(){
         TerminalApp.switchToPayment();
     })
 
     TerminalApp.init();
 
-    //render_carousel(test_data); // test_data obtained from test_data.js for sample
-    //add_banner();
 });
 
 
