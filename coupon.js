@@ -2,9 +2,11 @@ var TerminalApp = {
     terminal_id: null,
     terminal_id_cron_interval: 3000,
     webSocket: null,
-    switch_to_payment_interval: 20000,
+    switch_to_payment_interval: (180*1000),
     switch_to_payment_cron: null,
-    url: "ws://vfilvgcepdev.verifone.com:9080/verifonecloud/v1/broadcastserver"
+    url: "ws://vfilvgcepdev.verifone.com:9080/verifonecloud/v1/broadcastserver",
+    terminal_server_time_diff: null,
+    clock: null
 };
 
 /*
@@ -67,8 +69,10 @@ Coupon.prototype.renderView = function(template_id) {
  * Alternative for renderView() 
  */
 Coupon.prototype.renderViewCarousel = function(json_data){
-    render_carousel(json_data);
-    add_banner();
+    if(json_data.coupons){
+        render_carousel(json_data);
+        add_banner();
+    }
 }
 
 /*
@@ -186,6 +190,26 @@ TerminalApp.init_web_socket = function(url){
     TerminalApp.init_web_socket_events();
 }
 
+/*
+ * Returns diffrence in time between current and time from server
+ * So clock runs by current_time +- diff
+ */
+TerminalApp.get_time_diff = function(dtime){
+
+    ar = dtime.replace('T',' ').replace('+0000','').split(' ')
+
+    d = ar[0].split('-')
+    t = ar[1].split(':')
+
+    var date = new Date(d[0],d[1]-1,d[2],t[0],t[1],t[2])
+
+    var diff = ((new Date()) - date);
+
+    console.log("TerminalApp.get_time_diff: diff is "+ diff);
+
+    return diff;
+}
+
 TerminalApp.init_web_socket_events = function(){
     if(TerminalApp.webSocket){
         // On message event
@@ -200,6 +224,15 @@ TerminalApp.init_web_socket_events = function(){
 
             if(jsonObj){
                 TerminalApp.switchToBrowser(); // Please check if required ?
+
+                try{
+                    TerminalApp.terminal_server_time_diff = TerminalApp.get_time_diff(jsonObj.terminal_server_time);
+                    if(!TerminalApp.clock){
+                        TerminalApp.startTime();
+                    }
+                } catch(e){
+                    console.log("webSocket.onmessage: Error parsing time diff");
+                }
 
                 var coupon = new Coupon("container", jsonObj);
                 console.log("Rendering coupon page");
@@ -220,6 +253,35 @@ TerminalApp.init_web_socket_events = function(){
 
         }
     }
+}
+
+/*
+ * Clock 
+ */
+TerminalApp.startTime = function(){
+    var today=new Date((new Date()) - TerminalApp.terminal_server_time_diff);
+    var monthNames = [ "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December" ];
+
+    var h=today.getHours();
+    var m=today.getMinutes();
+    var s=today.getSeconds();
+
+    h = TerminalApp.checkTime(h);
+    m = TerminalApp.checkTime(m);
+    s = TerminalApp.checkTime(s);
+
+    try{
+        $('.time')[0].innerHTML = h+":"+m+":"+s;
+        $('.date')[0].innerHTML = monthNames[today.getMonth()] + " " + today.getDate() + ", " + today.getFullYear();
+    } catch(e){}
+
+    TerminalApp.clock = setTimeout(function(){TerminalApp.startTime()},1000);
+}
+
+TerminalApp.checkTime = function(i) {
+    if (i<10) {i = "0" + i};  // add zero in front of numbers < 10
+    return i;
 }
 
 /*
@@ -254,7 +316,7 @@ TerminalApp.init = function(){
 function render_carousel(js_data, template){
     var carousel_template = template || "carousel_template";
     var template = $("#"+carousel_template).html();
-    var render = Mustache.render(template,js_data.terminal_message);
+    var render = Mustache.render(template,js_data);
 
     $("#container").html(render);
 
