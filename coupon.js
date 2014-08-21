@@ -2,7 +2,7 @@ var TerminalApp = {
     terminal_id: null,
     terminal_id_cron_interval: 3000,
     webSocket: null,
-    switch_to_payment_interval: (180*1000),
+    switch_to_payment_interval: 20,
     switch_to_payment_cron: null,
     url: "ws://vfilvgcepdev.verifone.com:9080/verifonecloud/v1/broadcastserver",
     terminal_server_time_diff: null,
@@ -239,6 +239,7 @@ TerminalApp.init_web_socket_events = function(){
                 //coupon.renderView();  Ignored template_* 
                 coupon.renderViewCarousel(coupon.data);
 
+                TerminalApp.switch_to_payment_interval = 180 * 1000;
                 TerminalApp.reset_payment_cron(); // Reset 20 sec timeout after every msg
             }
         }
