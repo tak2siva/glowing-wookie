@@ -2,11 +2,12 @@ var TerminalApp = {
     terminal_id: null,
     terminal_id_cron_interval: 3000,
     webSocket: null,
-    switch_to_payment_interval: 20,
+    switch_to_payment_interval: 20000,
     switch_to_payment_cron: null,
     url: "ws://vfilvgcepdev.verifone.com:9080/verifonecloud/v1/broadcastserver",
     terminal_server_time_diff: null,
-    clock: null
+    clock: null,
+    coupon: null
 };
 
 /*
@@ -19,6 +20,7 @@ function getRandomInt(min, max) {
 function Coupon(container, data) {
     this.data = data;
     this.container = container;
+    this.used_coupons = 0;
 }
 
 /**
@@ -236,10 +238,15 @@ TerminalApp.init_web_socket_events = function(){
 
                 var coupon = new Coupon("container", jsonObj);
                 console.log("Rendering coupon page");
+
+                TerminalApp.coupon = coupon;
+
                 //coupon.renderView();  Ignored template_* 
                 coupon.renderViewCarousel(coupon.data);
 
-                TerminalApp.switch_to_payment_interval = 180 * 1000;
+                if(coupon.coupons && coupon.coupons.length > 0){
+                    TerminalApp.switch_to_payment_interval = 180 * 1000;
+                }
                 TerminalApp.reset_payment_cron(); // Reset 20 sec timeout after every msg
             }
         }
@@ -323,6 +330,14 @@ function render_carousel(js_data, template){
 
     $(".couponbutton").on("click",function(){
         var coupon_id = $(this).attr('coupon_id');
+
+        TerminalApp.coupon.used_coupons += 1;
+
+        // Alter payment cron interval based on used coupons
+        if(!TerminalApp.coupon.coupons || (TerminalApp.coupon.used_coupons >= TerminalApp.coupon.coupons.length)){
+            TerminalApp.switch_to_payment_interval = 20000;
+            TerminalApp.reset_payment_cron();
+        }
 
         // To toggle barcode when use coupon button is clicked
         $("#org_coupon_"+coupon_id).hide();
