@@ -198,10 +198,11 @@ TerminalApp.init_web_socket = function(url){
  */
 TerminalApp.get_time_diff = function(dtime){
 
-    ar = dtime.replace('T',' ').replace('+0000','').split(' ')
+    //ar = dtime.replace('T',' ').replace('+0000','').split(' ')
+    ar = dtime.split("T");
 
     d = ar[0].split('-')
-    t = ar[1].split(':')
+    t = ar[1].slice(0,8).split(':')
 
     var date = new Date(d[0],d[1]-1,d[2],t[0],t[1],t[2])
 
@@ -399,6 +400,8 @@ function add_banner(){
 
 $(function() {
     Coupon.renderHomePage();
+
+    //init_testing_setup();
 
     $("#no_thanks").click(function(){
         TerminalApp.switchToPayment();
