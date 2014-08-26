@@ -282,12 +282,14 @@ TerminalApp.startTime = function(){
     var m=today.getMinutes();
     var s=today.getSeconds();
 
+    var ampm = (h >= 12) ? "pm" : "am";
+
     h = TerminalApp.checkTime(h);
     m = TerminalApp.checkTime(m);
     s = TerminalApp.checkTime(s);
 
     try{
-        $('.time')[0].innerHTML = h+":"+m+":"+s;
+        $('.time')[0].innerHTML = h+":"+m + " " + ampm;
         $('.date')[0].innerHTML = monthNames[today.getMonth()] + " " + today.getDate() + ", " + today.getFullYear();
     } catch(e){}
 
@@ -438,7 +440,7 @@ function add_banner(){
 $(function() {
     Coupon.renderHomePage();
 
-    init_testing_setup();
+    //init_testing_setup();
 
     $("#no_thanks").click(function(){
         TerminalApp.switchToPayment();
