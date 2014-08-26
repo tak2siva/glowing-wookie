@@ -84,6 +84,7 @@ Coupon.renderHomePage = function() {
     var template = $("#template_0").html();
     Mustache.parse(template);
     $("#container").html(Mustache.render(template));
+    TerminalApp.init_payment_cron();    
 }
 
 TerminalApp.get_terminal_id = function(){
@@ -324,7 +325,6 @@ function init_testing_setup(){
 TerminalApp.init = function(){
     TerminalApp.init_web_socket();
     TerminalApp.get_terminal_id();
-    TerminalApp.init_payment_cron();    
 }
 
 Coupon.set_min_no_of_coupons = function(js_data){
