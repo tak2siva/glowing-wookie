@@ -119,11 +119,19 @@
                <div class="coupondata" style="border: 1px solid blue;margin:15px;width:570px;height:215px;position: relative;"> 
                 <div class="c_left" style="float:left;width:250px;height:215px;position:absolute;">
                   <div class="coup-pic" style="width:250px;height:215px;position:absolute;">
-                    <img src="{{coupon_image}}" alt="cimg" width="250" height="215" /> </div> 
+                    <img
+                      {{#dummy}}
+                          hidden="true" 
+                      {{/dummy}} 
+                      src="{{coupon_image}}" alt="cimg" width="250" height="215" /> </div> 
                   
                  </div>
                 
-                <div class="c_right" style="position: absolute; right: 0px;width: 320px;height:215px;">
+                <div class="c_right" style="position: absolute; right: 0px;width: 320px;height:215px;"
+                 {{#dummy}} 
+                 hidden="true"
+                  {{/dummy}}
+                  >
                 <div class="c_info" style="margin:25px;overflow:hidden;">
                  <div class="c_msg" style="overflow:hidden;font-size:26px;font-weight:bold;"> Thank you for Tweeting!</div>
                  <div class="c_desc" style="overflow:hidden;font-size:22px;width:250px;height:50px;">{{coupon_description}}</div>

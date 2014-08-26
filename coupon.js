@@ -2,7 +2,7 @@ var TerminalApp = {
     terminal_id: null,
     terminal_id_cron_interval: 3000,
     webSocket: null,
-    switch_to_payment_interval: 20000,
+    switch_to_payment_interval: 30000,
     switch_to_payment_cron: null,
     url: "ws://vfilvgcepdev.verifone.com:9080/verifonecloud/v1/broadcastserver",
     terminal_server_time_diff: null,
@@ -324,12 +324,35 @@ TerminalApp.init = function(){
     TerminalApp.init_payment_cron();    
 }
 
+Coupon.set_min_no_of_coupons = function(js_data){
+    var i;
+    
+    if(js_data.coupons instanceof Array){
+        i = js_data.coupons.length
+    } else if(js_data.coupons){
+        i = 1;
+        js_data.coupons = [js_data.coupons];
+    } else {
+        i=0;
+        js_data.coupons = [];
+    }
+
+    for(;i<2;i++){
+        js_data.coupons.push({dummy: true});
+    }
+
+    return js_data;
+}
+
 /*
  * Create carousel effect
  */
 function render_carousel(js_data, template){
     var carousel_template = template || "carousel_template";
     var template = $("#"+carousel_template).html();
+
+    js_data = Coupon.set_min_no_of_coupons(js_data);
+
     var render = Mustache.render(template,js_data);
 
     $("#container").html(render);
@@ -337,17 +360,25 @@ function render_carousel(js_data, template){
     $(".couponbutton").on("click",function(){
         var coupon_id = $(this).attr('coupon_id');
 
+        /*
         TerminalApp.coupon.used_coupons += 1;
-
         // Alter payment cron interval based on used coupons
+
         if(!TerminalApp.coupon.coupons || (TerminalApp.coupon.used_coupons >= TerminalApp.coupon.coupons.length)){
             TerminalApp.switch_to_payment_interval = 20000;
             TerminalApp.reset_payment_cron();
         }
+        */
+
+        TerminalApp.reset_payment_cron();
 
         // To toggle barcode when use coupon button is clicked
         $("#org_coupon_"+coupon_id).hide();
         $("#barcode_coupon_"+coupon_id).show();
+    });
+
+    $(".jssora13l, .jssora13r").on("click", function(){
+        TerminalApp.reset_payment_cron();
     });
 
     this.options = {
@@ -406,7 +437,7 @@ function add_banner(){
 $(function() {
     Coupon.renderHomePage();
 
-    //init_testing_setup();
+    init_testing_setup();
 
     $("#no_thanks").click(function(){
         TerminalApp.switchToPayment();
