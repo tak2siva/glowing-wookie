@@ -156,19 +156,23 @@ TerminalApp.callPHP = function callPHP(url, xmlOut, cb) {
  * This is a long polling checks every 3 sec for terminal_id
  * Once detected it will be sent and polling will be destroyed   
  */
-TerminalApp.terminal_id_cron = setInterval(function(){
-    if(TerminalApp.terminal_id){
-        if(TerminalApp.webSocket.readyState == 1){
-            clearInterval(TerminalApp.terminal_id_cron);
-            console.log("TerminalApp.terminal_id_cron: Got terminal_id: " + TerminalApp.terminal_id);
-            TerminalApp.send_id();  // Send terminal_id to server via socket
+TerminalApp.init_terminal_id_cron = function(){
+    TerminalApp.terminal_id_cron = setInterval(function(){
+        if(TerminalApp.terminal_id){
+            if(TerminalApp.webSocket.readyState == 1){
+                clearInterval(TerminalApp.terminal_id_cron);
+                console.log("TerminalApp.terminal_id_cron: Got terminal_id: " + TerminalApp.terminal_id);
+                TerminalApp.send_id();  // Send terminal_id to server via socket
+            } else {
+                console.log("TerminalApp.terminal_id_cron: WebSocket not initialized")
+            }
         } else {
-            console.log("TerminalApp.terminal_id_cron: WebSocket not initialized")
+            console.log("TerminalApp.terminal_id_cron: Retrying for terminal_id");
         }
-    } else {
-        console.log("TerminalApp.terminal_id_cron: Retrying for terminal_id");
-    }
-},TerminalApp.terminal_id_cron_interval);
+    },TerminalApp.terminal_id_cron_interval);
+}
+
+TerminalApp.init_terminal_id_cron();
 
 // Init timout for switch to payment in 20 sec
 TerminalApp.init_payment_cron = function(){
@@ -258,6 +262,7 @@ TerminalApp.init_web_socket_events = function(){
             // Re-initialize webSocket after 10-20 sec
             setTimeout(function(){
                 TerminalApp.init_web_socket();
+                TerminalApp.init_terminal_id_cron();
             },getRandomInt(5,10) * 1000);
 
         }
