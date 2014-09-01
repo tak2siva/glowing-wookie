@@ -242,6 +242,11 @@ TerminalApp.init_web_socket_events = function(){
                     console.log("webSocket.onmessage: Error parsing time diff");
                 }
 
+                try {
+                    delete TerminalApp.coupon;
+                } catch(e){
+                    console.log("webSocket.onmessage: Error deleting TerminalApp.coupon");
+                }
                 var coupon = new Coupon("container", jsonObj);
                 console.log("Rendering coupon page");
 
