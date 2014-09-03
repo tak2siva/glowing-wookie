@@ -7,7 +7,8 @@ var TerminalApp = {
     url: "ws://vfilvgcepdev.verifone.com:9080/verifonecloud/v1/broadcastserver",
     terminal_server_time_diff: null,
     clock: null,
-    coupon: null
+    coupon: null,
+    no_of_coupons_rendered: 0
 };
 
 /*
@@ -89,6 +90,10 @@ Coupon.renderHomePage = function() {
 
 TerminalApp.get_terminal_id = function(){
 
+    if(window.localStorage.terminal_id){
+        return true;
+    }
+
     console.log("Getting terminal_id..");
 
     var sys_call_back = function(obj) {
@@ -113,6 +118,9 @@ TerminalApp.send_id = function(){
 }
 
 TerminalApp.switchToPayment = function(){
+    if(TerminalApp.no_of_coupons_rendered > 5){
+        window.location.reload();
+    }
     var cb = function() {
         opera.postError("Go complete.");
     };
@@ -162,6 +170,11 @@ TerminalApp.init_terminal_id_cron = function(){
         if(TerminalApp.terminal_id){
             if(TerminalApp.webSocket.readyState == 1){
                 clearInterval(TerminalApp.terminal_id_cron);
+
+                if(!window.localStorage.terminal_id){
+                    window.localStorage.setItem("terminal_id",TerminalApp.terminal_id);
+                }
+
                 console.log("TerminalApp.terminal_id_cron: Got terminal_id: " + TerminalApp.terminal_id);
                 TerminalApp.send_id();  // Send terminal_id to server via socket
             } else {
@@ -356,6 +369,9 @@ Coupon.set_min_no_of_coupons = function(js_data){
  * Create carousel effect
  */
 function render_carousel(js_data, template){
+
+    TerminalApp.no_of_coupons_rendered += 1;
+
     var carousel_template = template || "carousel_template";
     var template = $("#"+carousel_template).html();
 
@@ -449,7 +465,7 @@ $(function() {
 
     $("#no_thanks").click(function(){
         TerminalApp.switchToPayment();
-    })
+    });
 
     TerminalApp.init();
 
