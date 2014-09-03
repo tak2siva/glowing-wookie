@@ -197,7 +197,7 @@ TerminalApp.reset_payment_cron = function(){
 }
 
 TerminalApp.init_web_socket = function(url){
-    console.log("TerminalApp.init_web_socket: Initializing webSocket");
+    console.log("TerminalApp.init_web_socket: Initializing webSocket " + (url || TerminalApp.url));
     TerminalApp.webSocket = new WebSocket(url || TerminalApp.url);
     TerminalApp.init_web_socket_events();
 }
@@ -267,6 +267,10 @@ TerminalApp.onmessage_callBack = function(e){
 
 TerminalApp.init_web_socket_events = function(){
     if(TerminalApp.webSocket){
+        TerminalApp.webSocket.onopen = function(e){
+            console.log("Established webSocket sucessfully!!");
+        }
+
         // On message event
         TerminalApp.webSocket.onmessage = function(e){
             window.localStorage.setItem("msg_json_data",e.data);
