@@ -99,20 +99,15 @@ TerminalApp.get_terminal_id = function(){
 }
 
 TerminalApp.send_id = function(){
-    console.log("TerminalApp.send_id: executing..");
     if(TerminalApp.webSocket.readyState == 1){
-        try{
         var send_data = {
             terminal_id: TerminalApp.terminal_id,
             terminal_status: "Open"
         };
         console.log("Sending data to server: " + JSON.stringify(send_data));
         TerminalApp.webSocket.send(JSON.stringify(send_data));
-        } catch(e){
-            console.log("TerminalApp.send_id error: "+e.message);
-        }
     } else {
-        console.log("TerminalApp.send_id: webSocket not initialized and readyState is " + TerminalApp.webSocket.readyState);
+        console.log("TerminalApp.send_id: webSocket not initialized");
         return false;
     }
 }
@@ -165,13 +160,10 @@ TerminalApp.callPHP = function callPHP(url, xmlOut, cb) {
 TerminalApp.init_terminal_id_cron = function(){
     TerminalApp.terminal_id_cron = setInterval(function(){
         if(TerminalApp.terminal_id){
-            if(true || TerminalApp.webSocket.readyState == 1){
+            if(TerminalApp.webSocket.readyState == 1){
                 clearInterval(TerminalApp.terminal_id_cron);
                 console.log("TerminalApp.terminal_id_cron: Got terminal_id: " + TerminalApp.terminal_id);
-                window.localStorage.setItem("terminal_id",TerminalApp.terminal_id);
-                console.log("TerminalApp.terminal_id_cron: Calling send_id");
                 TerminalApp.send_id();  // Send terminal_id to server via socket
-                console.log("TerminalApp.terminal_id_cron: Done send_id");
             } else {
                 console.log("TerminalApp.terminal_id_cron: WebSocket not initialized")
             }
@@ -201,7 +193,6 @@ TerminalApp.reset_payment_cron = function(){
 }
 
 TerminalApp.init_web_socket = function(url){
-    console.log("TerminalApp.init_web_socket: Initializing webSocket " + (url || TerminalApp.url));
     TerminalApp.webSocket = new WebSocket(url || TerminalApp.url);
     TerminalApp.init_web_socket_events();
 }
@@ -227,11 +218,14 @@ TerminalApp.get_time_diff = function(dtime){
     return diff;
 }
 
-TerminalApp.onmessage_callBack = function(e){
-            console.log("webSocket.onmessage: Starting onmessage_callBack");
+TerminalApp.init_web_socket_events = function(){
+    if(TerminalApp.webSocket){
+        // On message event
+        TerminalApp.webSocket.onmessage = function(e){
             var jsonObj;
             try {
                 jsonObj = JSON.parse(e.data); // parse string to JSON Obj
+
             } catch (error) {
                 console.log(error.message);
             }
@@ -267,19 +261,6 @@ TerminalApp.onmessage_callBack = function(e){
                 TerminalApp.switch_to_payment_interval = 30 * 1000;
                 TerminalApp.reset_payment_cron(); // Reset 20 sec timeout after every msg
             }
-}
-
-TerminalApp.init_web_socket_events = function(){
-    if(TerminalApp.webSocket){
-        TerminalApp.webSocket.onopen = function(e){
-            console.log("Established webSocket sucessfully!!");
-        }
-
-        // On message event
-        TerminalApp.webSocket.onmessage = function(e){
-            window.localStorage.setItem("msg_json_data",e.data);
-            window.location = "carousel.html"
-            TerminalApp.onmessage_callBack(e);
         }
 
         TerminalApp.webSocket.onclose = function(e){
@@ -464,22 +445,7 @@ function add_banner(){
 $(function() {
     Coupon.renderHomePage();
 
-    init_testing_setup();
-
-    // Reload handler
-    if(parseInt(window.localStorage.terminal_id)){
-        console.log("Found terminal_id in localStorage: " + parseInt(window.localStorage.terminal_id));
-        TerminalApp.terminal_id = parseInt(window.localStorage.terminal_id);
-    }
-
-    // Reload handler
-    if(window.localStorage.msg_json_data){
-        console.log("Sending message from Reload handler..");
-        TerminalApp.onmessage_callBack({data:window.localStorage.msg_json_data});
-        delete window.localStorage.msg_json_data;
-    } else {
-        Coupon.renderHomePage();
-    }
+    //init_testing_setup();
 
     $("#no_thanks").click(function(){
         TerminalApp.switchToPayment();
