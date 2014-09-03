@@ -99,6 +99,7 @@ TerminalApp.get_terminal_id = function(){
 }
 
 TerminalApp.send_id = function(){
+    console.log("TerminalApp.send_id: executing..");
     if(TerminalApp.webSocket.readyState == 1){
         var send_data = {
             terminal_id: TerminalApp.terminal_id,
@@ -164,7 +165,9 @@ TerminalApp.init_terminal_id_cron = function(){
                 clearInterval(TerminalApp.terminal_id_cron);
                 console.log("TerminalApp.terminal_id_cron: Got terminal_id: " + TerminalApp.terminal_id);
                 window.localStorage.setItem("terminal_id",TerminalApp.terminal_id);
+                console.log("TerminalApp.terminal_id_cron: Calling send_id");
                 TerminalApp.send_id();  // Send terminal_id to server via socket
+                console.log("TerminalApp.terminal_id_cron: Done send_id");
             } else {
                 console.log("TerminalApp.terminal_id_cron: WebSocket not initialized")
             }
@@ -220,6 +223,7 @@ TerminalApp.get_time_diff = function(dtime){
 }
 
 TerminalApp.onmessage_callBack = function(e){
+            console.log("webSocket.onmessage: Starting onmessage_callBack");
             var jsonObj;
             try {
                 jsonObj = JSON.parse(e.data); // parse string to JSON Obj
@@ -455,11 +459,13 @@ $(function() {
 
     // Reload handler
     if(parseInt(window.localStorage.terminal_id)){
+        console.log("Found terminal_id in localStorage: " + parseInt(window.localStorage.terminal_id));
         TerminalApp.terminal_id = parseInt(window.localStorage.terminal_id);
     }
 
     // Reload handler
     if(window.localStorage.msg_json_data){
+        console.log("Sending message from Reload handler..");
         TerminalApp.onmessage_callBack({data:window.localStorage.msg_json_data});
         delete window.localStorage.msg_json_data;
     } else {
