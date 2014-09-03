@@ -91,6 +91,8 @@ Coupon.renderHomePage = function() {
 TerminalApp.get_terminal_id = function(){
 
     if(window.localStorage.terminal_id){
+        console.log("using terminal_id from localStorage: " + window.localStorage.terminal_id);
+        TerminalApp.terminal_id = window.localStorage.terminal_id;        
         return true;
     }
 
@@ -242,6 +244,22 @@ TerminalApp.init_web_socket_events = function(){
             } catch (error) {
                 console.log(error.message);
             }
+
+            // PONG handler
+            if(jsonObj){
+                if(jsonObj.terminal_status=="PING" && jsonObj.terminal_id){
+                    var pong = {
+                        "remote_host_id": jsonObj.remote_host_id,
+                        "terminal_id": jsonObj.terminal_id,
+                        "terminal_status":"PONG",
+                        "server_response_message":"Yep I'm Here"
+                    };                    
+                    console.log("sending PONG response: " + JSON.stringify(pong));
+                    TerminalApp.webSocket.send(JSON.stringify(pong));
+                    return true;
+                }
+            }
+
 
             if(jsonObj){
                 TerminalApp.switchToBrowser(); // Please check if required ?
