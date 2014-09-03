@@ -108,7 +108,7 @@ TerminalApp.send_id = function(){
         console.log("Sending data to server: " + JSON.stringify(send_data));
         TerminalApp.webSocket.send(JSON.stringify(send_data));
     } else {
-        console.log("TerminalApp.send_id: webSocket not initialized");
+        console.log("TerminalApp.send_id: webSocket not initialized and readyState is " + TerminalApp.webSocket.readyState);
         return false;
     }
 }
@@ -197,6 +197,7 @@ TerminalApp.reset_payment_cron = function(){
 }
 
 TerminalApp.init_web_socket = function(url){
+    console.log("TerminalApp.init_web_socket: Initializing webSocket");
     TerminalApp.webSocket = new WebSocket(url || TerminalApp.url);
     TerminalApp.init_web_socket_events();
 }
