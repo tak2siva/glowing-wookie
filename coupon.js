@@ -161,7 +161,7 @@ TerminalApp.callPHP = function callPHP(url, xmlOut, cb) {
 TerminalApp.init_terminal_id_cron = function(){
     TerminalApp.terminal_id_cron = setInterval(function(){
         if(TerminalApp.terminal_id){
-            if(TerminalApp.webSocket.readyState == 1){
+            if(true || TerminalApp.webSocket.readyState == 1){
                 clearInterval(TerminalApp.terminal_id_cron);
                 console.log("TerminalApp.terminal_id_cron: Got terminal_id: " + TerminalApp.terminal_id);
                 window.localStorage.setItem("terminal_id",TerminalApp.terminal_id);
