@@ -8,7 +8,8 @@ var TerminalApp = {
     terminal_server_time_diff: null,
     clock: null,
     coupon: null,
-    no_of_coupons_rendered: 0
+    no_of_coupons_rendered: 0,
+    no_of_coupons: 0
 };
 
 /*
@@ -377,6 +378,7 @@ Coupon.set_min_no_of_coupons = function(js_data){
     }
 
     for(;i<2;i++){
+        TerminalApp.no_of_coupons += 1;
         js_data.coupons.push({dummy: true});
     }
 
@@ -442,6 +444,11 @@ function render_carousel(js_data, template){
                         $Steps: 1                                       //[Optional] Steps to go for each navigation request, default value is 1
                     }
                 };
+    if(TerminalApp.no_of_coupons == 0){
+        $("#header_msg").width("auto");
+        $("#userdata").width("auto");
+        return true;
+    }            
 
     var jssor_slider1 = new $JssorSlider$("slider1_container", options);
 
@@ -479,7 +486,7 @@ function add_banner(){
 $(function() {
     Coupon.renderHomePage();
 
-    //init_testing_setup();
+    init_testing_setup();
 
     $("#no_thanks").click(function(){
         TerminalApp.switchToPayment();
