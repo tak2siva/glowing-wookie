@@ -101,12 +101,16 @@ TerminalApp.get_terminal_id = function(){
 TerminalApp.send_id = function(){
     console.log("TerminalApp.send_id: executing..");
     if(TerminalApp.webSocket.readyState == 1){
+        try{
         var send_data = {
             terminal_id: TerminalApp.terminal_id,
             terminal_status: "Open"
         };
         console.log("Sending data to server: " + JSON.stringify(send_data));
         TerminalApp.webSocket.send(JSON.stringify(send_data));
+        } catch(e){
+            console.log("TerminalApp.send_id error: "+e.message);
+        }
     } else {
         console.log("TerminalApp.send_id: webSocket not initialized and readyState is " + TerminalApp.webSocket.readyState);
         return false;
