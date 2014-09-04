@@ -246,6 +246,14 @@ TerminalApp.init_web_socket_events = function(){
                 console.log(error.message);
             }
 
+            if(jsonObj){
+                if(jsonObj.customer_exit == "Y"){
+                    console.log("Exiting to home page..");
+                    Coupon.renderHomePage();
+                    return true;
+                }
+            }
+
             // PONG handler
             if(jsonObj){
                 if(jsonObj.terminal_status=="PING" && jsonObj.terminal_id){
