@@ -407,6 +407,7 @@ function render_carousel(js_data, template){
 
     var render = Mustache.render(template,js_data);
 
+    $("#container").html('');
     $("#container").html(render);
 
     $(".couponbutton").on("click",function(){
