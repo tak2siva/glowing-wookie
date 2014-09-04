@@ -456,6 +456,8 @@ function render_carousel(js_data, template){
     if(TerminalApp.no_of_coupons == 0){
         $("#header_msg").width("auto");
         $("#userdata").width("auto");
+        $(".jssora13l").hide();
+        $(".jssora13r").hide();
         return true;
     }            
 
