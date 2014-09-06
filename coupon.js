@@ -246,6 +246,13 @@ TerminalApp.init_web_socket_events = function(){
                 console.log(error.message);
             }
 
+            if (jsonObj) {
+                if(jsonObj.server_response_message=="HELLO"){
+                    console.log("onmessage: Got hello from server");
+                    return true;
+                }
+            }
+
             if(jsonObj){
                 if(jsonObj.customer_exit == "Y"){
                     console.log("Exiting to home page..");
@@ -270,7 +277,7 @@ TerminalApp.init_web_socket_events = function(){
             }
 
 
-            if(jsonObj){
+            if(jsonObj && jsonObj.coupon){
                 TerminalApp.switchToBrowser(); // Please check if required ?
 
                 try{
@@ -289,7 +296,7 @@ TerminalApp.init_web_socket_events = function(){
                 }
                 var coupon = new Coupon("container", jsonObj);
                 console.log("====Rendering coupon page====");
-                console.log(jsonObj);
+                console.log(JSON.stringify(jsonObj));
 
                 TerminalApp.coupon = coupon;
 
