@@ -301,6 +301,8 @@ TerminalApp.init_web_socket_events = function(){
                 TerminalApp.switch_to_payment_interval = 30 * 1000;
                 TerminalApp.reset_payment_cron(); // Reset 20 sec timeout after every msg
             }
+
+            jsonObj = null;
         }
 
         TerminalApp.webSocket.onclose = function(e){
