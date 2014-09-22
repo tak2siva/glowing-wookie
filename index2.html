@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>Demo</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+    <!-- Test data -->
+    <script type="text/javascript" src="test_data.js"></script>
+    <!-- Test data -->
+    <script type="text/javascript" src="jssor.core.js"></script>
+    <script type="text/javascript" src="jssor.utils.js"></script>
+    <script type="text/javascript" src="jssor.slider.js"></script>
+<script src="film_roll.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="arrow.css">
+  </head>
+  <body>
+      <div id="root_div">
+	  <div>
+           <a><img src="user_icon.png"></img></a>
+	  </div>
+	  <div>
+           <a><img src="user_icon.png"></img></a>
+	  </div>
+	  <div>
+           <a><img src="user_icon.png"></img></a>
+	  </div>
+      </div>
+<script type="text/javascript">
+   var f = new FilmRoll({container: "#root_div"});
+</script>
+  </body>
+   
+</html>

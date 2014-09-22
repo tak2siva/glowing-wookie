@@ -9,7 +9,12 @@ var TerminalApp = {
     clock: null,
     coupon: null,
     no_of_coupons_rendered: 0,
-    no_of_coupons: 0
+    no_of_coupons: 0,
+    heart_beat: null,
+    heart_beat_interval: 5000,
+    heart_beat_missed: 0,
+    heart_beat_tolerate: 5,
+    heart_beat_msg: "--heartbeat--"
 };
 
 /*
@@ -234,6 +239,23 @@ TerminalApp.get_time_diff = function(dtime){
     return diff;
 }
 
+TerminalApp.init_heart_beat = function(){
+    TerminalApp.heart_beat = setInterval(function(){
+        try{
+            TerminalApp.heart_beat_missed += 1;
+            if(TerminalApp.heart_beat_missed > TerminalApp.heart_beat_tolerate){
+                throw new Error("Too many missed heartbeats.");
+            }
+            TerminalApp.webSocket.send(TerminalApp.heart_beat_msg);
+        } catch(e){
+            clearInterval(TerminalApp.heart_beat);
+            TerminalApp.heart_beat = null;
+            console.log("Closing and re-init connection reason: " + e.message);
+            TerminalApp.webSocket.close();
+        }
+    },TerminalApp.heart_beat_interval);
+}
+
 TerminalApp.init_web_socket_events = function(){
     if(TerminalApp.webSocket){
         // On message event
@@ -244,6 +266,13 @@ TerminalApp.init_web_socket_events = function(){
 
             } catch (error) {
                 console.log(error.message);
+            }
+
+            if(jsonObj){
+                if(jsonObj.heart_beat == TerminalApp.heart_beat_msg){
+                    TerminalApp.heart_beat_missed = 0;
+                    return true;
+                }
             }
 
             if (jsonObj) {
@@ -277,7 +306,7 @@ TerminalApp.init_web_socket_events = function(){
             }
 
 
-            if(jsonObj && jsonObj.coupon){
+            if(jsonObj){
                 TerminalApp.switchToBrowser(); // Please check if required ?
 
                 try{
@@ -323,6 +352,8 @@ TerminalApp.init_web_socket_events = function(){
             },getRandomInt(5,10) * 1000);
 
         }
+
+        TerminalApp.init_heart_beat();
     }
 }
 
@@ -387,6 +418,9 @@ Coupon.set_min_no_of_coupons = function(js_data){
     
     if(js_data.coupons instanceof Array){
         i = js_data.coupons.length
+        if(i>1){
+            TerminalApp.no_of_coupons = i; // hot fix for the below loop
+        }
     } else if(js_data.coupons){
         i = 1;
         js_data.coupons = [js_data.coupons];
@@ -471,7 +505,10 @@ function render_carousel(js_data, template){
         return true;
     }            
 
-    var jssor_slider1 = new $JssorSlider$("slider1_container", options);
+    //var jssor_slider1 = new $JssorSlider$("slider1_container", options);
+    var film_roll = new FilmRoll({
+        container: "#sl_container"
+    });
 
 }
 
